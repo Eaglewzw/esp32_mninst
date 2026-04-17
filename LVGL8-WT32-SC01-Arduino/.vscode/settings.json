@@ -1,0 +1,4 @@
+{
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "platformio-ide.pythonPath": "/usr/bin/python3"
+}
