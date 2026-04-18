@@ -2,15 +2,17 @@
 mnist_gui.py — 手写数字识别 GUI
 仿 WT32-SC01 480×320 触摸屏布局
 
+修复：条形框延伸至面板右边界，百分比标签叠放在条形内部右侧
+
 布局（坐标以窗口左上角为原点）：
-  ┌── 标题栏 h=36 ──────────────────────────────────────────┐
+  ┌── 标题栏 h=40 ──────────────────────────────────────────┐
   │ ●  MNIST Digit Recognition               [WT32-SC01]   │
   ├──────────────────────────┬─────────────────────────────┤
   │  DRAW 卡片               │  RESULT 面板                 │
-  │  x=6  w=242  h=242       │  x=254  w=220  h=284         │
+  │  x=8  w=248  h=248       │  x=268  w=364  h=320         │
   │  画布 224×224 (28×8px)   │  大数字 + Confidence + 概率条│
   ├──────────────────────────┤                              │
-  │  CLEAR 按钮 y=288 h=26   │                              │
+  │  CLEAR 按钮 y=310 h=36   │                              │
   └──────────────────────────┴─────────────────────────────┘
 """
 
@@ -138,10 +140,10 @@ class App(tk.Tk):
 
         tk.Label(bar, text="●  MNIST Digit Recognition",
                  bg=CARD, fg=ACC,
-                 font=("Mono", 250, "bold")).place(x=12, y=0, height=TITLE_H)
+                 font=("Mono", 200, "bold")).place(x=12, y=0, height=TITLE_H)
         tk.Label(bar, text="[WT32-SC01]",
                  bg=CARD, fg=SUB,
-                 font=("Mono", 250)).place(x=WIN_W-130, y=0, height=TITLE_H)
+                 font=("Mono", 200)).place(x=WIN_W-130, y=0, height=TITLE_H)
         # 底部分隔线
         tk.Frame(self, bg=BORDER).place(x=0, y=TITLE_H-1, width=WIN_W, height=1)
 
@@ -168,7 +170,7 @@ class App(tk.Tk):
         # CLEAR 按钮（绝对坐标，在卡片下方）
         tk.Button(self, text="CLEAR", command=self._clear,
                   bg=RED_C, fg="white", relief=tk.FLAT,
-                  font=("Mono", 250, "bold"),
+                  font=("Mono", 200, "bold"),
                   activebackground="#cc2a2a",
                   cursor="hand2").place(x=CLX, y=CLY, width=CLW, height=CLH)
 
@@ -196,7 +198,7 @@ class App(tk.Tk):
         dbox.place(x=6, y=DIG_Y, width=RW-12, height=DIG_H)
 
         self.lbl_digit = tk.Label(dbox, text="?", bg=BG, fg=GRN,
-                                  font=("Mono", 500, "bold"))
+                                  font=("Mono", 800, "bold"))
         self.lbl_digit.place(relx=0.5, rely=0.5, anchor="center")
 
         # Confidence 行
@@ -204,16 +206,21 @@ class App(tk.Tk):
         self.lbl_conf = tk.Label(panel,
                                  text="Confidence        —",
                                  bg=CARD, fg=TEXT,
-                                 font=("Mono", 250), anchor="w")
+                                 font=("Mono", 200), anchor="w")
         self.lbl_conf.place(x=6, y=CONF_Y, width=RW-12, height=24)
 
-        # 概率条（0~9）
+        # ── 概率条（0~9）────────────────────────────────────────────────
+        # 修复：BAR_W 撑满至右边界，不再为百分比标签预留右侧空间
+        # 百分比文字改为叠放在条形背景框内部右侧
         BAR_Y0    = CONF_Y + 28
         BAR_ROW_H = (RH - BAR_Y0 - 6) // 10   # ≈ 18~20
-        NUM_W     = 24    # 数字标签宽
-        PCT_W     = 58    # 百分比标签宽
-        GAP       = 6
-        BAR_W     = RW - 12 - NUM_W - GAP - PCT_W - GAP
+
+        NUM_W = 24   # 左侧数字标签宽
+        GAP   = 6    # 数字标签与条形之间的间距
+        PAD_R = 6    # 条形距面板右边缘的留白
+
+        # ★ 关键修复：BAR_W 延伸到右边界，不再减去 PCT_W
+        BAR_W = RW - 6 - NUM_W - GAP - PAD_R   # = 364-6-24-6-6 = 322
 
         self._fills = []
         self._plbls = []
@@ -222,28 +229,27 @@ class App(tk.Tk):
         for d in range(10):
             y = BAR_Y0 + d * BAR_ROW_H
 
-            # 数字编号
+            # 数字编号（左侧）
             tk.Label(panel, text=str(d), bg=CARD, fg=TEXT,
-                     font=("Mono", 200, "bold"),
+                     font=("Mono", 150, "bold"),
                      anchor="center").place(x=6, y=y,
                                             width=NUM_W,
                                             height=BAR_ROW_H - 2)
 
-            # 条形背景
+            # 条形背景框（延伸至右边界）
             bg_f = tk.Frame(panel, bg=BAR_BG)
-            bg_f.place(x=6+NUM_W+GAP, y=y+3,
+            bg_f.place(x=6 + NUM_W + GAP, y=y + 3,
                        width=BAR_W, height=BAR_ROW_H - 6)
 
-            # 条形填充
+            # 条形填充（宽度由推理结果动态设置）
             fill = tk.Frame(bg_f, bg=ACC)
             fill.place(x=0, y=0, relheight=1, width=0)
             self._fills.append((bg_f, fill))
 
-            # 百分比文字
-            pct = tk.Label(panel, text="  0%", bg=CARD, fg=SUB,
-                           font=("Mono", 12), anchor="w")
-            pct.place(x=6+NUM_W+GAP+BAR_W+GAP, y=y,
-                      width=PCT_W, height=BAR_ROW_H - 2)
+            # ★ 百分比标签：叠放在条形背景框内部，贴右对齐
+            pct = tk.Label(bg_f, text=" 0%", bg=BAR_BG, fg=SUB,
+                           font=("Mono", 120), anchor="e")
+            pct.place(relx=1.0, rely=0.5, anchor="e", x=-3)
             self._plbls.append(pct)
 
     # ── 绘图 ──────────────────────────────────
@@ -302,13 +308,21 @@ class App(tk.Tk):
         )
 
         for d, ((bg_f, fill), pct) in enumerate(zip(self._fills, self._plbls)):
-            p = float(probs[d])
-            w = int(p * self._bw)
-            c = color if d == pred else ACC
+            p  = float(probs[d])
+            w  = int(p * self._bw)
+            c  = color if d == pred else ACC
+
             fill.place(x=0, y=0, relheight=1, width=max(w, 0))
             fill.config(bg=c)
-            pct.config(text=f"{p*100:4.0f}%",
-                       fg=color if d == pred else SUB)
+
+            # 百分比标签：条形足够宽时将背景色改为与填充色一致，使文字浮于条形上
+            pct_text = f"{p*100:3.0f}%"
+            if d == pred:
+                pct.config(text=pct_text, fg="white",
+                           bg=c if w > 36 else BAR_BG)
+            else:
+                pct.config(text=pct_text, fg=SUB,
+                           bg=c if w > 36 else BAR_BG)
 
     def _reset(self):
         self.lbl_digit.config(text="?", fg=GRN)
@@ -316,7 +330,7 @@ class App(tk.Tk):
         for (bg_f, fill), pct in zip(self._fills, self._plbls):
             fill.place(x=0, y=0, relheight=1, width=0)
             fill.config(bg=ACC)
-            pct.config(text="   0%", fg=SUB)
+            pct.config(text=" 0%", fg=SUB, bg=BAR_BG)
 
 
 # ──────────────────────────────────────────────
