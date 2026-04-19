@@ -34,7 +34,9 @@ https://github.com/user-attachments/assets/result.mp4 (Note: Local path used bel
 - **Custom Inference Engine**: Hand-written C++ CNN operators (`nn_ops.cpp`) optimized for ESP32, avoiding the overhead of heavy frameworks like TFLite Micro.
 - **Int8 Quantization**: Model weights are quantized to `int8` with per-tensor scaling to minimize memory footprint while maintaining high accuracy.
 - **Sophisticated UI**: Interactive 28x28 drawing grid with real-time probability bar charts, powered by LovyanGFX.
-- **Robust Training**: PyTorch pipeline with data augmentation (rotation, translation, scaling, random erasing) and early stopping.
+- **Robust Training**: PyTorch pipeline with data augmentation (rotation ±10°, translation, scaling, random erasing) and early stopping.
+
+> ⚠️ **Input Orientation Requirement**: The model is trained on the standard MNIST dataset where all digits are **upright**. The data augmentation only covers small rotations (±10°). Therefore, you **must write digits in the normal upright orientation**. Writing at large angles (e.g., 90° or 180° rotated) will result in incorrect recognition.
 
 ---
 

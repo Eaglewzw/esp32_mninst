@@ -2,8 +2,6 @@
 mnist_gui.py — 手写数字识别 GUI
 仿 WT32-SC01 480×320 触摸屏布局
 
-修复：条形框延伸至面板右边界，百分比标签叠放在条形内部右侧
-
 布局（坐标以窗口左上角为原点）：
   ┌── 标题栏 h=40 ──────────────────────────────────────────┐
   │ ●  MNIST Digit Recognition               [WT32-SC01]   │
@@ -68,10 +66,10 @@ GRN     = "#3fb950"
 YLW     = "#d29922"
 RED_C   = "#f85149"
 BAR_BG  = "#21262d"
-GRID_LN = "#1c2030"   # 网格线颜色
+GRID_LN = "#1c2030"
 
 # ──────────────────────────────────────────────
-# 模型定义（与 train_mcu.py 一致）
+# 模型定义
 # ──────────────────────────────────────────────
 class MCU_CNN(nn.Module):
     def __init__(self):
@@ -140,10 +138,10 @@ class App(tk.Tk):
 
         tk.Label(bar, text="●  MNIST Digit Recognition",
                  bg=CARD, fg=ACC,
-                 font=("Mono", 200, "bold")).place(x=12, y=0, height=TITLE_H)
+                 font=("Mono", 10, "bold")).place(x=12, y=0, height=TITLE_H)
         tk.Label(bar, text="[WT32-SC01]",
                  bg=CARD, fg=SUB,
-                 font=("Mono", 200)).place(x=WIN_W-130, y=0, height=TITLE_H)
+                 font=("Mono", 10)).place(x=WIN_W-130, y=0, height=TITLE_H)
         # 底部分隔线
         tk.Frame(self, bg=BORDER).place(x=0, y=TITLE_H-1, width=WIN_W, height=1)
 
@@ -154,7 +152,7 @@ class App(tk.Tk):
         card.place(x=LX, y=LY, width=LW, height=LH)
 
         tk.Label(card, text="DRAW", bg=CARD, fg=SUB,
-                 font=("Mono", 200)).place(x=0, y=2, width=LW, height=16)
+                 font=("Mono", 8)).place(x=0, y=2, width=LW, height=16)
 
         # 画布（黑底，供鼠标绘图）
         self.cv = tk.Canvas(card, width=CAN_PX, height=CAN_PX,
@@ -167,10 +165,10 @@ class App(tk.Tk):
         self.cv.bind("<B1-Motion>",       self._on_drag)
         self.cv.bind("<ButtonRelease-1>", self._on_release)
 
-        # CLEAR 按钮（绝对坐标，在卡片下方）
+        # CLEAR 按钮
         tk.Button(self, text="CLEAR", command=self._clear,
                   bg=RED_C, fg="white", relief=tk.FLAT,
-                  font=("Mono", 200, "bold"),
+                  font=("Mono", 10, "bold"),
                   activebackground="#cc2a2a",
                   cursor="hand2").place(x=CLX, y=CLY, width=CLW, height=CLH)
 
@@ -189,7 +187,7 @@ class App(tk.Tk):
 
         # "RESULT" 标签
         tk.Label(panel, text="RESULT", bg=CARD, fg=SUB,
-                 font=("Mono", 200)).place(x=0, y=4, width=RW, height=18)
+                 font=("Mono", 8)).place(x=0, y=4, width=RW, height=18)
 
         # 大数字显示框
         DIG_Y, DIG_H = 24, 100
@@ -198,7 +196,7 @@ class App(tk.Tk):
         dbox.place(x=6, y=DIG_Y, width=RW-12, height=DIG_H)
 
         self.lbl_digit = tk.Label(dbox, text="?", bg=BG, fg=GRN,
-                                  font=("Mono", 800, "bold"))
+                                  font=("Mono", 56, "bold"))
         self.lbl_digit.place(relx=0.5, rely=0.5, anchor="center")
 
         # Confidence 行
@@ -206,21 +204,18 @@ class App(tk.Tk):
         self.lbl_conf = tk.Label(panel,
                                  text="Confidence        —",
                                  bg=CARD, fg=TEXT,
-                                 font=("Mono", 200), anchor="w")
+                                 font=("Mono", 10), anchor="w")
         self.lbl_conf.place(x=6, y=CONF_Y, width=RW-12, height=24)
 
-        # ── 概率条（0~9）────────────────────────────────────────────────
-        # 修复：BAR_W 撑满至右边界，不再为百分比标签预留右侧空间
-        # 百分比文字改为叠放在条形背景框内部右侧
+        # ── 概率条（0~9）──────────────────────
         BAR_Y0    = CONF_Y + 28
-        BAR_ROW_H = (RH - BAR_Y0 - 6) // 10   # ≈ 18~20
+        BAR_ROW_H = (RH - BAR_Y0 - 6) // 10
 
-        NUM_W = 24   # 左侧数字标签宽
-        GAP   = 6    # 数字标签与条形之间的间距
-        PAD_R = 6    # 条形距面板右边缘的留白
+        NUM_W = 24
+        GAP   = 6
+        PAD_R = 6
 
-        # ★ 关键修复：BAR_W 延伸到右边界，不再减去 PCT_W
-        BAR_W = RW - 6 - NUM_W - GAP - PAD_R   # = 364-6-24-6-6 = 322
+        BAR_W = RW - 6 - NUM_W - GAP - PAD_R  # 322
 
         self._fills = []
         self._plbls = []
@@ -231,24 +226,24 @@ class App(tk.Tk):
 
             # 数字编号（左侧）
             tk.Label(panel, text=str(d), bg=CARD, fg=TEXT,
-                     font=("Mono", 150, "bold"),
+                     font=("Mono", 9, "bold"),
                      anchor="center").place(x=6, y=y,
                                             width=NUM_W,
                                             height=BAR_ROW_H - 2)
 
-            # 条形背景框（延伸至右边界）
+            # 条形背景框
             bg_f = tk.Frame(panel, bg=BAR_BG)
             bg_f.place(x=6 + NUM_W + GAP, y=y + 3,
                        width=BAR_W, height=BAR_ROW_H - 6)
 
-            # 条形填充（宽度由推理结果动态设置）
+            # 条形填充
             fill = tk.Frame(bg_f, bg=ACC)
             fill.place(x=0, y=0, relheight=1, width=0)
             self._fills.append((bg_f, fill))
 
-            # ★ 百分比标签：叠放在条形背景框内部，贴右对齐
+            # 百分比标签（叠放在条形内部右侧）
             pct = tk.Label(bg_f, text=" 0%", bg=BAR_BG, fg=SUB,
-                           font=("Mono", 120), anchor="e")
+                           font=("Mono", 8), anchor="e")
             pct.place(relx=1.0, rely=0.5, anchor="e", x=-3)
             self._plbls.append(pct)
 
@@ -315,7 +310,6 @@ class App(tk.Tk):
             fill.place(x=0, y=0, relheight=1, width=max(w, 0))
             fill.config(bg=c)
 
-            # 百分比标签：条形足够宽时将背景色改为与填充色一致，使文字浮于条形上
             pct_text = f"{p*100:3.0f}%"
             if d == pred:
                 pct.config(text=pct_text, fg="white",
