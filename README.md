@@ -10,21 +10,19 @@ A high-performance, lightweight CNN pipeline for handwritten digit recognition o
 ## 📺 Showcase
 
 ### Project Demo
-Behold the real-time inference capability of the ESP32!
-
-[![Bilibili Video](https://img.shields.io/badge/Bilibili-视频演示-00A1D6?style=for-the-badge&logo=bilibili)](https://www.bilibili.com/video/BV12XdBBdEAA/)
-
-https://github.com/user-attachments/assets/result.mp4 (Note: Local path used below)
 
 <div align="center">
-  <video src="assets/result.mp4" width="600" controls></video>
-  <br>
-  <i>Real-time handwritten digit recognition on WT32-SC01</i>
+  <img src="assets/result.gif" alt="视频演示" width="80%">
+  <p><i>Real-time handwritten digit recognition on WT32-SC01</i></p>
+  <p><b>📺 <a href="https://www.bilibili.com/video/BV12XdBBdEAA/">点击此处前往 Bilibili 观看完整高清演示视频</a></b></p>
 </div>
 
 ### Featured UI
-![High-Res UI](assets/img.png)
-*Modern, tech-style UI with real-time probability distribution.*
+
+<div align="center">
+  <img src="assets/img.png" alt="High-Res UI" width="80%">
+  <p><i>（Modern, tech-style UI with real-time probability distribution.）</i></p>
+</div>
 
 ---
 
