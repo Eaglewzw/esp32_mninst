@@ -96,21 +96,6 @@ The inference engine implements the following operators from scratch:
 - `nn_batchnorm`: Batch normalization folded into scales and biases for zero runtime overhead.
 - `nn_maxpool2d`: 2x2 max pooling.
 - `nn_dense`: Fully connected layer with ReLU/Softmax activation.
-
-### Memory Optimization
-Activations are managed in a double-buffer strategy to minimize peak memory usage, fitting well within the ESP32's internal DRAM (~31 KB for activation buffers).
-
-![Loss Design](loss_function_design.png)
-*Visualizing the design philosophy behind the optimization.*
-
----
-
-## 🎨 Visualization Gallery
-
-| Data Distribution | Sample Digits | Model Comparison |
-| :---: | :---: | :---: |
-| ![Distribution](mnist_distribution.png) | ![Samples](mnist_samples.png) | ![Comparison](compare_models.png) |
-
 ---
 
 ## 📜 License
