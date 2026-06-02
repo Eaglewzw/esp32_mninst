@@ -1,102 +1,57 @@
-# ESP-Net: MNIST Digit Recognition on ESP32
+# ESP-Net
 
-[![Platform: ESP32](https://img.shields.io/badge/Platform-ESP32-red.svg)](https://www.espressif.com/en/products/socs/esp32)
-[![Framework: Arduino](https://img.shields.io/badge/Framework-Arduino-blue.svg)](https://www.arduino.cc/)
-[![Training: PyTorch](https://img.shields.io/badge/Training-PyTorch-ee4c2c.svg)](https://pytorch.org/)
-[![UI: LovyanGFX](https://img.shields.io/badge/UI-LovyanGFX-green.svg)](https://github.com/lovyan03/LovyanGFX)
-
-A high-performance, lightweight CNN pipeline for handwritten digit recognition on embedded systems. This project covers the entire lifecycle from GPU-accelerated training on PC to optimized deployment on a WT32-SC01 (ESP32) touch screen device.
-
-## 📺 Showcase
-
-### Project Demo
+基于 **ESP32 (WT32-SC01)** 的实时手写数字识别系统，集成手写 C++ CNN 推理引擎与 LovyanGFX 图形库。
 
 <div align="center">
-  <img src="assets/result.gif" alt="视频演示" width="80%">
-  <p><i>Real-time handwritten digit recognition on WT32-SC01</i></p>
-  <p><b>📺 <a href="https://www.bilibili.com/video/BV12XdBBdEAA/">点击此处前往 Bilibili 观看完整高清演示视频</a></b></p>
+
+[![Bilibili](https://img.shields.io/badge/Bilibili-观看演示-ff69b4?style=flat-square&logo=bilibili)](https://www.bilibili.com/video/BV12XdBBdEAA/)
+[![Platform](https://img.shields.io/badge/Platform-ESP32-red?style=flat-square)](https://www.espressif.com/en/products/socs/esp32)
+[![Framework](https://img.shields.io/badge/Framework-Arduino-blue?style=flat-square)](https://www.arduino.cc/)
+[![Training](https://img.shields.io/badge/Training-PyTorch-ee4c2c?style=flat-square)](https://pytorch.org/)
+
 </div>
 
-### Featured UI
+## 系统流程
+
+系统利用 ESP32 的双核架构与手写优化的 CNN 算子实现高效识别：
+
+1. **预处理**：WT32-SC01 电容触摸屏实时采集手写轨迹，自动下采样并归一化为 28x28 灰度矩阵。
+2. **推理**：调用自研 C++ 推理引擎 (`nn_ops`)，执行 Int8 量化卷积、BN 融合、MaxPool 与全连接计算。
+3. **渲染**：LovyanGFX 驱动 3.5 寸屏幕，实时绘制手写画布与前 10 类数字的概率分布条形图。
+
+> ⚠️ **注意**：模型在标准 MNIST 数据集上训练，仅支持 **正向** 写入识别。
 
 <div align="center">
-  <img src="assets/img.png" alt="High-Res UI" width="80%">
-  <p><i>（Modern, tech-style UI with real-time probability distribution.）</i></p>
+  <img src="assets/result.gif" width="80%" />
 </div>
 
----
+## 项目结构
 
-## 🌟 Key Features
-
-- **Full-Stack AIoT**: Includes data downloading, GPU-accelerated training, weight quantization, and embedded deployment.
-- **Custom Inference Engine**: Hand-written C++ CNN operators (`nn_ops.cpp`) optimized for ESP32, avoiding the overhead of heavy frameworks like TFLite Micro.
-- **Int8 Quantization**: Model weights are quantized to `int8` with per-tensor scaling to minimize memory footprint while maintaining high accuracy.
-- **Sophisticated UI**: Interactive 28x28 drawing grid with real-time probability bar charts, powered by LovyanGFX.
-- **Robust Training**: PyTorch pipeline with data augmentation (rotation ±10°, translation, scaling, random erasing) and early stopping.
-
-> ⚠️ **Input Orientation Requirement**: The model is trained on the standard MNIST dataset where all digits are **upright**. The data augmentation only covers small rotations (±10°). Therefore, you **must write digits in the normal upright orientation**. Writing at large angles (e.g., 90° or 180° rotated) will result in incorrect recognition.
-
----
-
-## 📊 Model & Training Performance
-
-The model follows a lightweight CNN architecture:
-`Conv2D(8, 3x3) -> BN -> ReLU -> MaxPool -> Conv2D(16, 3x3) -> BN -> ReLU -> MaxPool -> Flatten -> Dense(64) -> Dense(10)`
-
-### Training Progress
-The training pipeline features automated learning rate reduction and early stopping to ensure optimal convergence.
-
-![Training Curves](training_curves.png)
-
-### Model Evaluation
-The model achieves high accuracy on the MNIST test set, as shown by the confusion matrix and error analysis.
-
-| Confusion Matrix | Error Analysis |
-| :---: | :---: |
-| ![Confusion Matrix](confusion_matrix.png) | ![Wrong Samples](wrong_samples.png) |
-
----
-
-## 🛠️ Hardware Requirements
-
-- **Module**: [WT32-SC01](http://www.wireless-tag.com/portfolio/wt32-sc01/) (ESP32-WROVER-B)
-- **Display**: 3.5-inch 320x480 Capacitive Multi-touch Screen
-- **Memory**: 4MB External PSRAM (utilized for UI and activations)
-
----
-
-## 🚀 Getting Started
-
-### 1. Training & Exporting
-```bash
-# 1. Download MNIST dataset
-python download_mnist.py
-
-# 2. Train the model (requires PyTorch & CUDA for best performance)
-python train_mcu.py
-
-# 3. Export weights to model_weights.h
-python export_weights.py
+```
+esp_net/
+├── esp_mnist_arduino/   # ESP32 固件实现（推理算子、UI 交互、驱动配置）
+├── train_mcu.py         # 模型训练脚本（PyTorch 实现，含数据增强）
+├── export_weights.py    # 权重导出工具（模型量化 & C 头文件生成）
+├── download_mnist.py    # MNIST 数据集下载与预处理
+└── mnist_gui.py         # PC 端模型验证 GUI
 ```
 
-### 2. ESP32 Deployment
-The firmware is built using **PlatformIO**.
+## 依赖
 
-1. Open the `LVGL8-WT32-SC01-Arduino` folder in VS Code with the PlatformIO extension.
-2. Ensure `model_weights.h` (generated in step 1.3) is copied to `src/`.
-3. Connect your WT32-SC01 and click **Upload**.
+- **硬件**：WT32-SC01 (ESP32-WROVER-B)、3.5 寸 320x480 电容触摸屏
+- **软件**：PlatformIO (Arduino)、LovyanGFX、PyTorch 2.x
 
----
+## 快速开始
 
-## 🔬 Technical Implementation Details
+用于训练与部署模型：
 
-### Lightweight Inference (`nn_ops.h`)
-The inference engine implements the following operators from scratch:
-- `nn_conv2d_same`: 3x3 convolution with SAME padding and `int8` weights.
-- `nn_batchnorm`: Batch normalization folded into scales and biases for zero runtime overhead.
-- `nn_maxpool2d`: 2x2 max pooling.
-- `nn_dense`: Fully connected layer with ReLU/Softmax activation.
----
+```bash
+# 1. 训练模型并导出 Int8 权重
+python download_mnist.py
+python train_mcu.py
+python export_weights.py
 
-## 📜 License
-MIT License. Feel free to use this for your own geeky projects!
+# 2. 部署固件
+# 将生成的 model_weights.h 放入 esp_mnist_arduino/src/
+# 使用 PlatformIO 编译并烧录 esp_mnist_arduino 项目
+```
