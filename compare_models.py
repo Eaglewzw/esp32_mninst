@@ -7,7 +7,7 @@ compare_models.py — float32 vs int8 量化模型在测试集上的对比（PyT
   → 与原始 float32 权重模型在完全相同的测试数据上对比
 
 输出图：
-  compare_models.png  (2×3 共6个子图)
+  assets/analysis/compare_models.png  (2×3 共6个子图)
     1. 总体准确率对比
     2. 各类别准确率对比
     3. 置信度分布对比
@@ -17,6 +17,7 @@ compare_models.py — float32 vs int8 量化模型在测试集上的对比（PyT
 """
 
 import copy
+from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
@@ -27,6 +28,9 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import matplotlib.gridspec as gridspec
+
+ANALYSIS_DIR = Path(__file__).resolve().parent / "assets" / "analysis"
+ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
 
 # ─────────────────────────────────────────────
 # 0. 中文字体 & 设备
@@ -359,8 +363,9 @@ else:
     ax6.text(0.5, 0.5, "无分歧样本\n（两模型预测完全一致）",
              ha="center", va="center", fontproperties=zh_font, fontsize=12)
 
-plt.savefig("compare_models.png", dpi=150, bbox_inches="tight")
-print("\n图表已保存: compare_models.png")
+compare_models_path = ANALYSIS_DIR / "compare_models.png"
+plt.savefig(compare_models_path, dpi=150, bbox_inches="tight")
+print(f"\n图表已保存: {compare_models_path}")
 plt.show()
 
 print(f"""

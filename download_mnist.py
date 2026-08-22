@@ -4,6 +4,7 @@ MNIST 数据集下载 & 可视化脚本
 """
 
 import torch
+from pathlib import Path
 import torchvision
 import torchvision.transforms as transforms
 import matplotlib
@@ -12,6 +13,9 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.font_manager as fm
 import numpy as np
+
+ANALYSIS_DIR = Path(__file__).resolve().parent / "assets" / "analysis"
+ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── 中文字体配置 ──────────────────────────────
 _FONT_PATH = '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'
@@ -102,8 +106,9 @@ def show_samples_per_class(dataset, samples_per_class=5):
                               fontproperties=zh_font)
 
     plt.tight_layout()
-    plt.savefig("mnist_samples.png", dpi=150, bbox_inches='tight')
-    print("\n  [图1] 样本总览已保存: mnist_samples.png")
+    mnist_samples_path = ANALYSIS_DIR / "mnist_samples.png"
+    plt.savefig(mnist_samples_path, dpi=150, bbox_inches='tight')
+    print(f"\n  [图1] 样本总览已保存: {mnist_samples_path}")
     plt.show()
 
 
@@ -153,8 +158,9 @@ def show_single_image_detail(dataset, index=0):
     ax4.set_ylabel("像素均值", fontproperties=zh_font)
     ax4.grid(True, alpha=0.3)
 
-    plt.savefig("mnist_detail.png", dpi=150, bbox_inches='tight')
-    print("  [图2] 单张详细分析已保存: mnist_detail.png")
+    mnist_detail_path = ANALYSIS_DIR / "mnist_detail.png"
+    plt.savefig(mnist_detail_path, dpi=150, bbox_inches='tight')
+    print(f"  [图2] 单张详细分析已保存: {mnist_detail_path}")
     plt.show()
 
 
@@ -193,8 +199,9 @@ def show_pixel_distribution(dataset, num_samples=1000):
                      f'{count:,}', ha='center', va='bottom', fontsize=8)
 
     plt.tight_layout()
-    plt.savefig("mnist_distribution.png", dpi=150, bbox_inches='tight')
-    print("  [图3] 像素分布统计已保存: mnist_distribution.png")
+    mnist_distribution_path = ANALYSIS_DIR / "mnist_distribution.png"
+    plt.savefig(mnist_distribution_path, dpi=150, bbox_inches='tight')
+    print(f"  [图3] 像素分布统计已保存: {mnist_distribution_path}")
     plt.show()
 
 
@@ -212,6 +219,7 @@ if __name__ == "__main__":
 
     print(f"\n{'='*50}")
     print("  完成！数据已保存至 ./data/")
+    print(f"  图片目录: {ANALYSIS_DIR}")
     print("  生成图片: mnist_samples.png")
     print("             mnist_detail.png")
     print("             mnist_distribution.png")

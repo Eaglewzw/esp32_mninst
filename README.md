@@ -1,57 +1,68 @@
 # ESP-Net
 
-基于 **ESP32 (WT32-SC01)** 的实时手写数字识别系统，集成手写 C++ CNN 推理引擎与 LovyanGFX 图形库。
+English | [中文](README.zh-CN.md)
+
+A real-time handwritten digit recognition system for the **ESP32 (WT32-SC01)**, featuring a custom C++ CNN inference engine and the LovyanGFX graphics library.
 
 <div align="center">
 
-[![Bilibili](https://img.shields.io/badge/Bilibili-观看演示-ff69b4?style=flat-square&logo=bilibili)](https://www.bilibili.com/video/BV12XdBBdEAA/)
+[![Bilibili](https://img.shields.io/badge/Bilibili-Watch_Demo-ff69b4?style=flat-square&logo=bilibili)](https://www.bilibili.com/video/BV12XdBBdEAA/)
 [![Platform](https://img.shields.io/badge/Platform-ESP32-red?style=flat-square)](https://www.espressif.com/en/products/socs/esp32)
 [![Framework](https://img.shields.io/badge/Framework-Arduino-blue?style=flat-square)](https://www.arduino.cc/)
 [![Training](https://img.shields.io/badge/Training-PyTorch-ee4c2c?style=flat-square)](https://pytorch.org/)
 
 </div>
 
-## 系统流程
+## How It Works
 
-系统利用 ESP32 的双核架构与手写优化的 CNN 算子实现高效识别：
+The system uses the ESP32's dual-core architecture and hand-optimized CNN operators for efficient recognition:
 
-1. **预处理**：WT32-SC01 电容触摸屏实时采集手写轨迹，自动下采样并归一化为 28x28 灰度矩阵。
-2. **推理**：调用C++ 推理引擎 (`nn_ops`)，执行 Int8 量化卷积、BN 融合、MaxPool 与全连接计算。
-3. **渲染**：LovyanGFX 驱动 3.5 寸屏幕，实时绘制手写画布与前 10 类数字的概率分布条形图。
+1. **Preprocessing:** The WT32-SC01 capacitive touchscreen captures handwriting strokes in real time, then downsamples and normalizes them into a 28x28 grayscale matrix.
+2. **Inference:** The C++ inference engine (`nn_ops`) performs Int8 quantized convolution, batch-normalization fusion, MaxPool, and fully connected operations.
+3. **Rendering:** LovyanGFX drives the 3.5-inch display, rendering the drawing canvas and a live bar chart of probabilities for all 10 digit classes.
 
-> ⚠️ **注意**：模型在标准 MNIST 数据集上训练，仅支持 **正向** 写入识别。
+> ⚠️ **Note:** The model is trained on the standard MNIST dataset and recognizes upright handwritten digits only.
 
 <div align="center">
   <img src="assets/result.gif" width="80%" />
 </div>
 
-## 项目结构
+## Project Structure
 
 ```
 esp_net/
-├── esp_mnist_arduino/   # ESP32 固件实现（推理算子、UI 交互、驱动配置）
-├── train_mcu.py         # 模型训练脚本（PyTorch 实现，含数据增强）
-├── export_weights.py    # 权重导出工具（模型量化 & C 头文件生成）
-├── download_mnist.py    # MNIST 数据集下载与预处理
-└── mnist_gui.py         # PC 端模型验证 GUI
+├── assets/                 # Demo assets and training/evaluation charts
+│   └── analysis/          # Model analysis results
+├── data/                   # MNIST dataset
+├── esp_mnist_arduino/      # ESP32 firmware project
+│   ├── assets/            # Hardware and UI documentation images
+│   ├── src/               # Firmware source and exported weights
+│   └── tools/             # Firmware utility scripts
+├── train_mcu.py            # Model training script
+├── compare_models.py       # Float32/Int8 model comparison
+├── export_weights.py       # Quantized weight export tool
+├── download_mnist.py       # MNIST download and preprocessing
+├── mnist_gui.py            # Desktop model validation GUI
+├── mnist_model.pth         # Trained model
+└── model_weights.h         # Generated MCU weight header
 ```
 
-## 依赖
+## Requirements
 
-- **硬件**：WT32-SC01 (ESP32-WROVER-B)、3.5 寸 320x480 电容触摸屏
-- **软件**：PlatformIO (Arduino)、LovyanGFX、PyTorch 2.x
+- **Hardware:** WT32-SC01 (ESP32-WROVER-B) with a 3.5-inch 320x480 capacitive touchscreen
+- **Software:** PlatformIO (Arduino), LovyanGFX, and PyTorch 2.x
 
-## 快速开始
+## Quick Start
 
-用于训练与部署模型：
+Train and deploy the model:
 
 ```bash
-# 1. 训练模型并导出 Int8 权重
+# 1. Train the model and export Int8 weights
 python download_mnist.py
 python train_mcu.py
 python export_weights.py
 
-# 2. 部署固件
-# 将生成的 model_weights.h 放入 esp_mnist_arduino/src/
-# 使用 PlatformIO 编译并烧录 esp_mnist_arduino 项目
+# 2. Deploy the firmware
+# Copy the generated model_weights.h into esp_mnist_arduino/src/
+# Build and flash the esp_mnist_arduino project with PlatformIO
 ```

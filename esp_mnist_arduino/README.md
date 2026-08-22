@@ -3,7 +3,7 @@ https://github.com/sukesh-ak/ESP32-TUX
 
 # Graphics & Touch on WT32-SC01
 
-![device](device.png)
+![device](assets/device.png)
 
  
 - Board : WT32-SC01 from Wireless Tag (Seeed Studio also carries the same)  
@@ -13,7 +13,7 @@ https://github.com/sukesh-ak/ESP32-TUX
 - Framework : Arduino + PlatformIO ([ESP-IDF sample here](https://github.com/sukesh-ak/LVGL8-WT32-SC01-IDF)) 
 
 ## Demo code output
-![device](SampleUI.jpg)
+![device](assets/SampleUI.jpg)
 
 ## WT32-SC01 Specs  
 #### Pros:  

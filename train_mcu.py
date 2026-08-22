@@ -11,13 +11,14 @@ MNIST 轻量 CNN 训练（PyTorch + GPU 优化版）
 
 输出：
   mnist_model.pth          ← 最佳模型权重
-  training_curves.png      ← 训练过程曲线（loss / acc / lr）
-  loss_function_design.png ← 损失函数原理图
-  confusion_matrix.png     ← 混淆矩阵
-  wrong_samples.png        ← 错误样本
+  assets/analysis/training_curves.png      ← 训练过程曲线（loss / acc / lr）
+  assets/analysis/loss_function_design.png ← 损失函数原理图
+  assets/analysis/confusion_matrix.png     ← 混淆矩阵
+  assets/analysis/wrong_samples.png        ← 错误样本
 """
 
 import os
+from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
@@ -30,6 +31,9 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import itertools
+
+ANALYSIS_DIR = Path(__file__).resolve().parent / 'assets' / 'analysis'
+ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
 
 # ─────────────────────────────────────────────
 # 0. 中文字体 & 设备
@@ -326,8 +330,9 @@ ax.set_title('学习率曲线（ReduceLROnPlateau）', fontproperties=zh_font)
 ax.grid(True, alpha=0.3, which='both')
 
 plt.tight_layout()
-plt.savefig('training_curves.png', dpi=150, bbox_inches='tight')
-print('\n[图1] 训练曲线已保存: training_curves.png')
+training_curves_path = ANALYSIS_DIR / 'training_curves.png'
+plt.savefig(training_curves_path, dpi=150, bbox_inches='tight')
+print(f'\n[图1] 训练曲线已保存: {training_curves_path}')
 plt.show()
 
 # ─────────────────────────────────────────────
@@ -417,8 +422,9 @@ for i in range(6):
 ax_blank = fig.add_subplot(gs_inner[1, 3])
 ax_blank.axis('off')
 
-plt.savefig('loss_function_design.png', dpi=150, bbox_inches='tight')
-print('[图2] 损失函数原理图已保存: loss_function_design.png')
+loss_design_path = ANALYSIS_DIR / 'loss_function_design.png'
+plt.savefig(loss_design_path, dpi=150, bbox_inches='tight')
+print(f'[图2] 损失函数原理图已保存: {loss_design_path}')
 plt.show()
 
 # ─────────────────────────────────────────────
@@ -454,8 +460,9 @@ for i, j in itertools.product(range(10), range(10)):
             color='white' if cm[i,j] > thresh else 'black',
             fontsize=10, fontweight='bold' if i == j else 'normal')
 plt.tight_layout()
-plt.savefig('confusion_matrix.png', dpi=150, bbox_inches='tight')
-print('[图3] 混淆矩阵已保存: confusion_matrix.png')
+confusion_matrix_path = ANALYSIS_DIR / 'confusion_matrix.png'
+plt.savefig(confusion_matrix_path, dpi=150, bbox_inches='tight')
+print(f'[图3] 混淆矩阵已保存: {confusion_matrix_path}')
 plt.show()
 
 # ─────────────────────────────────────────────
@@ -475,8 +482,9 @@ for ax, idx in zip(axes.flat, wrong_idx[:20]):
                  fontproperties=zh_font, fontsize=10, color='red')
     ax.axis('off')
 plt.tight_layout()
-plt.savefig('wrong_samples.png', dpi=150, bbox_inches='tight')
-print('[图4] 错误样本已保存: wrong_samples.png')
+wrong_samples_path = ANALYSIS_DIR / 'wrong_samples.png'
+plt.savefig(wrong_samples_path, dpi=150, bbox_inches='tight')
+print(f'[图4] 错误样本已保存: {wrong_samples_path}')
 plt.show()
 
 print(f"""
