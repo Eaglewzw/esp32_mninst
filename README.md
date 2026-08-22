@@ -1,6 +1,6 @@
 # ESP-Net
 
-English | [中文](README.zh-CN.md)
+<p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 A real-time handwritten digit recognition system for the **ESP32 (WT32-SC01)**, featuring a custom C++ CNN inference engine and the LovyanGFX graphics library.
 

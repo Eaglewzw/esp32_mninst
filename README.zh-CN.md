@@ -1,6 +1,6 @@
 # ESP-Net
 
-[English](README.md) | 中文
+<p align="center"><a href="README.md">English</a> | 中文</p>
 
 基于 **ESP32 (WT32-SC01)** 的实时手写数字识别系统，集成手写 C++ CNN 推理引擎与 LovyanGFX 图形库。
 
